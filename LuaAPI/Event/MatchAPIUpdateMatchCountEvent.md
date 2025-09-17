@@ -1,0 +1,38 @@
+# MatchAPIUpdateMatchCountEvent
+## 설명
+> Ugc 매칭 진행 UI 갱신 이벤트
+
+## 선언
+> USGFramework.Runtime.Contents.Events.MatchAPIUpdateMatchCountEvent
+
+## 주의사항
+| **동작 여부** |          **설명**          |
+|:---------:|:------------------------:|
+|     O     | Client Logic에서 사용 가능합니다. |
+|     X     | Server Logic에서 사용 가능합니다. |
+> Event함수들은 Start,OnDestroy 함수에서 등록과 해제를 해주어야 합니다.
+> 해당 Event는 Client Logic에서만 사용 가능한 함수 입니다.
+
+## Parameter
+| **형식** |   **파라미터**   | **설명** |
+|:------:|:------------:|:------:|
+|  int   | matchedCount | 모집된 인원 |
+
+## Sample Code
+```lua
+--Call
+    local EventCenter = nil
+ 
+    function this.Start()
+        EventCenter = USGFramework.Runtime.USGZone.EventCenter
+        EventCenter.StartListenToEvent(this.EventFunction, typeof(USGFramework.Runtime.Contents.Events.MatchAPIUpdateMatchCountEvent))
+    end
+ 
+    function this.OnDestroy()
+        EventCenter.StopListenToEvent(this.EventFunction, typeof(USGFramework.Runtime.Contents.Events.MatchAPIUpdateMatchCountEvent))
+    end
+ 
+    function this.EventFunction(matchedCount)
+        print("@matchedCount :"..tostring(matchedCount))
+    end
+```

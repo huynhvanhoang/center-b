@@ -1,0 +1,79 @@
+# SetFranchiseeEntry
+
+## 설명
+> Franchisee에 EntryKey값으로 EntryValue값을 저장합니다.
+## 선언
+> USGFramework.Runtime.Contents.FranchiseeAPI.SetFranchiseeEntry
+## 주의사항
+|    **함수 동작 환경**    | **동작 여부** |
+|:------------------:|:---------:|
+| ```Client Logic``` |  ```O```  |
+| ```Server Logic``` |  ```O```  |
+> 가져올 Franchisee 없을 경우 CallBack결과 값에 오류로 나타냅니다.
+---
+
+
+## Parameter
+|           **형식**            |   **파라미터**   |              **설명**              |
+|:---------------------------:|:------------:|:--------------------------------:|
+|          Function           |   Callback   |   반환된 결과를 받는 데 사용되는 콜백 메서드입니다    |
+|             int             | ConnectionId |           대상 유저의 커넥션ID           |
+|   [EntryKey](EntryKey.md)   |   EntryKey   |            세팅할 엔트리 키             |
+| [EntryValue](EntryValue.md) |  EntryValue  |            세팅할 엔트리 값             |
+|           string            |   FreeData   | 사용자가 CallBack에서 자유롭게 사용하기 위한 데이터 |
+## CallBack
+|           **형식**            |   **파라미터**   |              **설명**              |
+|:---------------------------:|:------------:|:--------------------------------:|
+| [ResultData](ResultData.md) |    Result    |               결과 값               |
+|             int             | ConnectionId |           대상 유저의 커넥션ID           |
+| [EntryValue](EntryValue.md) |  EntryValue  |              엔트리 값               |
+|           string            |  	FreeData   | 사용자가 CallBack에서 자유롭게 사용하기 위한 데이터 |
+
+
+## Sample Code
+```lua
+--Call
+function this.Call_SetFranchiseeEntry()
+    local Clients = USGFramework.Runtime.Core.USGNetwork.NetworkUtility.GetAllClientsInfo()
+    if Clients ~= nil then
+        for i=0,Clients.Length - 1 do
+            local ConnectionID = Clients[i].ConnectionID
+            local Code = "Test"
+            local CodeKey = "TestKey"
+            --local Type = USGFramework.Runtime.Contents.APIDataStruct.EntryValue.EntryDataType.String
+            local Type = USGFramework.Runtime.Contents.APIDataStruct.EntryValue.EntryDataType.Long
+            --local Type = USGFramework.Runtime.Contents.APIDataStruct.EntryValue.EntryDataType.Bool
+            local EntryValue = 0
+            local Key = USGFramework.Runtime.Contents.APIDataStruct.EntryKey.New(Code,CodeKey)
+    
+            local Value = USGFramework.Runtime.Contents.APIDataStruct.EntryValue.New(Type,true,EntryValue,"FreeData")
+            USGFramework.Runtime.Contents.FranchiseeAPI.SetFranchiseeEntry(this.CallBack_SetFranchiseeEntry,ConnectionID,Key,Value)
+        end
+    end
+end
+```
+
+```lua
+--CallBack
+function this.CallBack_SetFranchiseeEntry(result,TargetConnectionID,entryValue,FreeData)
+    print("@Result Code :".. tostring(result.Code) ..", Message : "..tostring(result.Message))
+ 
+    local _Bool = entryValue.BoolValue
+    local _Long =entryValue.LongValue
+    local _String =entryValue.StringValue
+ 
+    local Type = tostring(entryValue.DataType)
+    print("@TargetConnectionID  :".. tostring(TargetConnectionID))
+    print("@ValueType  :".. tostring(Type))
+    if Type == "Long" then
+        print("@LongValue  :".. tostring(_Long))
+    elseif Type == "String" then
+        print("@StringValue  :".. tostring(_String))
+    elseif Type == "Bool" then
+        print("@BoolValue  :".. tostring(_Bool))
+    elseif Type == "None" then
+        print("@@@_Noen")
+    end
+  print("@@@"..FreeData)
+end
+```
